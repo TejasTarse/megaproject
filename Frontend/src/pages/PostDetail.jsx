@@ -16,7 +16,7 @@ export default function PostDetail() {
 
   const [loading, setLoading] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  // const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Ensures we increment views only once per component mount (protects against StrictMode double-mount)
   const didViewRef = useRef(false);
@@ -50,7 +50,8 @@ export default function PostDetail() {
           }
         } finally {
           // re-fetch post so UI shows updated views (server truth)
-          try { await dispatch(fetchPost(slug)).unwrap(); } catch (e) {}
+          try { await dispatch(fetchPost(slug)).unwrap(); } catch (e) {console.log(e);
+          }
         }
       }
     })();
@@ -60,9 +61,9 @@ export default function PostDetail() {
 
   if (loading || !current) return <div className="p-8">Loading...</div>;
 
-  const isOwner = Boolean(
-    userId && (current.userId === userId || current.userId === (auth.user?._id || auth.user?.id))
-  );
+  // const isOwner = Boolean(
+  //   userId && (current.userId === userId || current.userId === (auth.user?._id || auth.user?.id))
+  // );
 
   const likesCount = current.likes?.length || 0;
   const viewsCount = current.views || 0;
@@ -76,23 +77,10 @@ export default function PostDetail() {
       await dispatch(likePost(current._id)).unwrap();
     } catch (err) {
       console.error("Like failed", err);
-      try { await dispatch(fetchPost(current._id)).unwrap(); } catch {}
+      try { await dispatch(fetchPost(current._id)).unwrap(); } catch(err) {console.log(err);
+      }
     } finally {
       setLikeLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this post?")) return;
-    setDeleteLoading(true);
-    try {
-      await API.delete(`/posts/${current._id}`);
-      navigate("/posts");
-    } catch (err) {
-      console.error("Delete failed", err);
-      alert("Delete failed");
-    } finally {
-      setDeleteLoading(false);
     }
   };
 

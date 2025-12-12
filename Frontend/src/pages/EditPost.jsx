@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { fetchPost, updatePost } from "../redux/postsSlice";
+// import { useDispatch } from "react-redux";
+// import { fetchPost, updatePost } from "../redux/postsSlice";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import { CATEGORIES } from "../utils/categories";

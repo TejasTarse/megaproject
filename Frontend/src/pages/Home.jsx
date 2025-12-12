@@ -11,7 +11,8 @@ export default function Home(){
       try {
         const res = await API.get("/posts");
         setPosts(res.data.slice(0, 8)); // show featured 8
-      } catch (err) {}
+      } catch (err) {console.log(err);
+      }
     };
     load();
   }, []);
