@@ -8,27 +8,25 @@ import AllPosts from "./pages/AllPosts";
 import PostDetail from "./pages/PostDetail";
 import AddPost from "./pages/AddPost";
 import EditPost from "./pages/EditPost";
-import MyPosts from "./pages/MyPosts";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
+import MyPosts from "./pages/Myposts";
 
 function App(){
   return (
     <Provider store={store}>
       <BrowserRouter>
         <Header />
-        <main className="min-h-[calc(100vh-160px)]"> {/* keep footer visible */}
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/posts" element={<AllPosts />} />
-            <Route path="/post/:slug" element={<PostDetail />} />
-            <Route path="/add" element={<AddPost />} />
-            <Route path="/edit/:slug" element={<EditPost />} />
-            <Route path="/my-posts" element={<MyPosts />} />
-          </Routes>
-        </main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/posts" element={<AllPosts />} />
+          <Route path="/post/:slug" element={<PostDetail />} />
+          <Route path="/add" element={<AddPost />} />
+          <Route path="/my-posts" element={<MyPosts />} />
+          <Route path="/edit/:slug" element={<EditPost />} />
+        </Routes>
         <Footer />
       </BrowserRouter>
     </Provider>

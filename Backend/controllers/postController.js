@@ -145,19 +145,14 @@ export const likePost = async (req, res) => {
 export const viewPost = async (req, res) => {
   try {
     const { slug } = req.params;
-
-    // Atomic increment and return new doc
     const updated = await Post.findOneAndUpdate(
       { _id: slug },
       { $inc: { views: 1 } },
       { new: true }
     );
-
     if (!updated) return res.status(404).json({ message: "Post not found" });
-
-    return res.json(updated);
+    res.json(updated);
   } catch (error) {
-    console.error("viewPost error:", error);
-    return res.status(500).json({ message: "View Post Error", error });
+    res.status(500).json({ message: "View Post Error", error });
   }
 };

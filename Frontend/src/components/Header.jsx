@@ -1,178 +1,81 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
+import { CATEGORIES } from "../utils/categories";
 import { useState } from "react";
-import { CATEGORIES } from "../utils/categories"; // You already have this
 
-export default function Header() {
-  const auth = useSelector((s) => s.auth);
+export default function Header(){
+  const auth = useSelector(s => s.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [open, setOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
+
+  const user = auth.user;
+  const role = user?.role;
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/");
   };
 
-  const active = (path) =>
-    location.pathname === path ? "text-cyan-600 font-semibold" : "text-gray-600";
-
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+    <header className="bg-white shadow-sm">
+      <div className="container mx-auto px-4 flex items-center justify-between py-3">
+        <div className="flex items-center space-x-6">
+          <Link to="/" className="text-2xl font-bold">MyBlog</Link>
 
-        {/* LOGO */}
-        <Link to="/" className="text-2xl font-bold text-cyan-700">
-          MyBlog
-        </Link>
-
-        {/* DESKTOP NAV */}
-        <nav className="hidden md:flex items-center gap-6">
-
-          {/* ALL POSTS BUTTON */}
+          {/* Primary link always visible */}
           
-
-          {/* CATEGORY QUICK LINKS */}
           
-        </nav>
+        </div>
 
-        {/* Desktop Right Actions */}
-        <div className="hidden md:flex items-center gap-3">
-          {auth.user ? (
+        <nav className="flex items-center space-x-4">
+          {/* When not logged in: show Login / Signup only */}
+          {!user && (
             <>
-            <Link
-            to="/posts"
-            className={`${active("/posts")} hover:text-cyan-600`}
-          >
-            All Posts
-          </Link>
-              <Link to="/my-posts" className="px-3 py-1 rounded hover:bg-gray-100">
-                My Posts
-              </Link>
-              <button
-                onClick={() => navigate("/add")}
-                className="bg-cyan-600 text-white px-3 py-1 rounded"
-              >
-                Add Post
-              </button>
-              <button
-                onClick={handleLogout}
-                className="px-3 py-1 border rounded"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="px-3 py-1 border rounded">
-                Login
-              </Link>
-              <Link to="/signup" className="px-3 py-1 bg-cyan-600 text-white rounded">
-                Sign Up
-              </Link>
+              <Link to="/login" className="px-3 py-1 border rounded">Login</Link>
+              <Link to="/signup" className="px-3 py-1 bg-cyan-600 text-white rounded">Sign up</Link>
             </>
           )}
-        </div>
 
-        {/* MOBILE MENU ICON */}
-        <button
-          className="md:hidden p-2"
-          onClick={() => setOpen(!open)}
-          aria-label="menu"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
+          {/* When logged in: show MyPosts, Add Post, (All Users if admin), and user menu */}
+          {user && (
+            <>
+              
+                <Link to="/posts" className="text-gray-600 hover:text-cyan-600">All Posts</Link>
+
+              {/* My Posts (shows posts for the logged-in user, implement page separately) */}
+              <Link to="/my-posts" className="px-3 py-1 rounded hover:text-cyan-600">My Posts</Link>
+
+              {/* Add Post */}
+              <button onClick={()=>navigate("/add")} className="bg-cyan-600 text-white px-3 py-1 rounded">Add Post</button>
+
+              {/* Compact user menu */}
+              <div className="relative">
+                <button
+                      onClick={() => { setOpenMenu(false); handleLogout(); }}
+                      className="w-full text-left px-3 py-2 hover:bg-gray-50"
+                    >
+                      Logout
+                    </button>
+
+                {/* dropdown */}
+                {openMenu && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow z-50">
+                    <Link to="/profile" onClick={()=>setOpenMenu(false)} className="block px-3 py-2 hover:bg-gray-50">Profile</Link>
+                    <button
+                      onClick={() => { setOpenMenu(false); handleLogout(); }}
+                      className="w-full text-left px-3 py-2 hover:bg-gray-50"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </nav>
       </div>
-
-      {/* MOBILE DROPDOWN */}
-      {open && (
-        <div className="md:hidden bg-white border-t shadow-sm">
-          <div className="px-4 py-3 space-y-3">
-
-            {/* ALL POSTS BUTTON */}
-            <Link
-              to="/posts"
-              onClick={() => setOpen(false)}
-              className="block text-gray-700 text-lg font-semibold"
-            >
-              All Posts
-            </Link>
-
-            {/* Category List */}
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((cat) => (
-                <Link
-                  key={cat}
-                  to={`/posts?category=${encodeURIComponent(cat)}`}
-                  className="text-sm text-cyan-600"
-                  onClick={() => setOpen(false)}
-                >
-                  {cat}
-                </Link>
-              ))}
-            </div>
-
-            {/* Auth Buttons */}
-            {auth.user ? (
-              <>
-                <Link
-                  to="/my-posts"
-                  onClick={() => setOpen(false)}
-                  className="block px-3 py-1 border rounded"
-                >
-                  My Posts
-                </Link>
-                <button
-                  onClick={() => {
-                    setOpen(false);
-                    navigate("/add");
-                  }}
-                  className="block w-full bg-cyan-600 text-white px-3 py-1 rounded"
-                >
-                  Add Post
-                </button>
-                <button
-                  onClick={() => {
-                    setOpen(false);
-                    handleLogout();
-                  }}
-                  className="block w-full px-3 py-1 border rounded"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  onClick={() => setOpen(false)}
-                  className="block px-3 py-1 border rounded"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={() => setOpen(false)}
-                  className="block bg-cyan-600 text-white px-3 py-1 rounded"
-                >
-                  Sign Up
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </header>
-  );
+  )
 }

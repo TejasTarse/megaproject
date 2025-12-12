@@ -1,91 +1,100 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPost, viewPost, likePost } from "../redux/postsSlice";
 import { useParams, useNavigate } from "react-router-dom";
-import dayjs from "dayjs";
 import API from "../api/axios";
+import dayjs from "dayjs";
 
 export default function PostDetail() {
   const { slug } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { current } = useSelector((s) => s.posts);
   const auth = useSelector((s) => s.auth);
   const userId = auth.user?.id || auth.user?._id;
 
+  const [loading, setLoading] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Ensures we increment views only once per component mount (protects against StrictMode double-mount)
+  const didViewRef = useRef(false);
 
   useEffect(() => {
+    if (!slug) return;
     let mounted = true;
-    const load = async () => {
+
+    (async () => {
       setLoading(true);
       try {
-        // fetch post
+        // 1) fetch the post
         await dispatch(fetchPost(slug)).unwrap();
       } catch (err) {
-        console.error("fetchPost failed:", err);
-        // optional: show not-found UI
-      }
-
-      // sessionStorage guard to ensure single increment per tab
-      try {
-        const key = `viewed_${slug}`;
-        if (!sessionStorage.getItem(key)) {
-          await dispatch(viewPost(slug)).unwrap();
-          sessionStorage.setItem(key, "1");
-        }
-      } catch (err) {
-        console.error("viewPost failed:", err);
+        console.error("fetchPost error:", err);
       } finally {
         if (mounted) setLoading(false);
       }
-    };
 
-    load();
+      // 2) increment views once for this mount (every open/navigation triggers this)
+      if (!didViewRef.current) {
+        didViewRef.current = true; // mark immediately to avoid duplicates from StrictMode
+        try {
+          await dispatch(viewPost(slug)).unwrap(); // increments on server and returns updated post
+        } catch (err) {
+          console.error("viewPost thunk failed, trying direct API call:", err);
+          try {
+            await API.post(`/posts/${slug}/view`);
+          } catch (err2) {
+            console.error("Direct API view call also failed:", err2);
+          }
+        } finally {
+          // re-fetch post so UI shows updated views (server truth)
+          try { await dispatch(fetchPost(slug)).unwrap(); } catch (e) {}
+        }
+      }
+    })();
+
     return () => { mounted = false; };
   }, [slug, dispatch]);
 
-  if (loading || !current) {
-    return <div className="p-8">Loading post...</div>;
-  }
+  if (loading || !current) return <div className="p-8">Loading...</div>;
 
-  // Like handler (in detail view)
+  const isOwner = Boolean(
+    userId && (current.userId === userId || current.userId === (auth.user?._id || auth.user?.id))
+  );
+
+  const likesCount = current.likes?.length || 0;
+  const viewsCount = current.views || 0;
+  const isLiked = Boolean(userId && (current.likes || []).some((id) => id.toString() === userId.toString()));
+
   const handleLike = async () => {
-    if (!userId) {
-      navigate("/login");
-      return;
-    }
+    if (!userId) { navigate("/login"); return; }
     if (likeLoading) return;
     setLikeLoading(true);
-
     try {
-      await dispatch(likePost(slug)).unwrap();
+      await dispatch(likePost(current._id)).unwrap();
     } catch (err) {
-      console.error("like in detail failed:", err);
-      // optionally refetch
-      try { await dispatch(fetchPost(slug)).unwrap(); } catch (_) {}
+      console.error("Like failed", err);
+      try { await dispatch(fetchPost(current._id)).unwrap(); } catch {}
     } finally {
       setLikeLoading(false);
     }
   };
 
-  const handleEdit = () => {
-    navigate(`/edit/${current._id}`);
-  };
-
   const handleDelete = async () => {
-    if (!confirm("Delete this post?")) return;
+    if (!confirm("Are you sure you want to delete this post?")) return;
+    setDeleteLoading(true);
     try {
-      await API.delete(`/posts/${current._id}`); // assumes protected delete endpoint and user is owner
+      await API.delete(`/posts/${current._id}`);
       navigate("/posts");
     } catch (err) {
-      console.error("delete failed:", err);
-      alert(err?.response?.data?.message || "Delete failed");
+      console.error("Delete failed", err);
+      alert("Delete failed");
+    } finally {
+      setDeleteLoading(false);
     }
   };
-
-  const isLiked = Boolean(userId && (current.likes || []).some(id => id.toString() === userId.toString()));
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -98,32 +107,41 @@ export default function PostDetail() {
 
         <div className="text-cyan-600 text-sm">{current.category}</div>
         <h1 className="text-2xl font-bold mt-2">{current.title}</h1>
-        <div className="text-gray-500 text-sm my-2">{dayjs(current.createdAt).format("MMM D, YYYY HH:mm")}</div>
 
-        <div className="mt-4 prose max-w-none">{current.content}</div>
+        <div className="text-gray-500 text-sm my-2 flex items-center justify-between">
+          <div>By: <span className="font-medium">{current.userId}</span></div>
+          <div>{dayjs(current.createdAt).format("MMM D, YYYY HH:mm")}</div>
+        </div>
+
+        <div className="mt-4 prose max-w-none whitespace-pre-wrap">{current.content}</div>
 
         <div className="mt-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={handleLike}
               disabled={likeLoading}
-              className={`px-3 py-1 rounded ${isLiked ? "bg-cyan-600 text-white" : "bg-gray-100"}`}
+              className={`flex items-center gap-2 px-3 py-1 rounded ${isLiked ? "bg-cyan-600 text-white" : "bg-gray-100 text-gray-700"}`}
             >
-              {isLiked ? "👍" : "🤍"} {current.likes?.length || 0}
+              <span>{isLiked ? "👍" : "🤍"}</span>
+              <span>{likesCount}</span>
             </button>
 
-            <div className="text-sm text-gray-600">Views: {current.views || 0}</div>
+            <div className="text-sm text-gray-600 flex items-center gap-2">
+              <span>👁️</span>
+              <span>{viewsCount}</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* show edit/delete only if owner or admin (frontend check only; server enforces) */}
-            { (auth.user && (auth.user.id === current.userId || auth.user._id === current.userId || auth.user.role === "admin")) && (
+          {/* <div className="flex items-center gap-2">
+            {isOwner && (
               <>
-                <button onClick={handleEdit} className="px-3 py-1 border rounded">Edit</button>
-                <button onClick={handleDelete} className="px-3 py-1 bg-red-500 text-white rounded">Delete</button>
+                <button onClick={() => navigate(`/edit/${current._id}`)} className="px-3 py-1 border rounded">Edit</button>
+                <button onClick={handleDelete} disabled={deleteLoading} className="px-3 py-1 bg-red-500 text-white rounded">
+                  {deleteLoading ? "Deleting..." : "Delete"}
+                </button>
               </>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

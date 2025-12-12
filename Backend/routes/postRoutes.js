@@ -20,7 +20,7 @@ router.get("/mine", protect, getMyPosts);
 router.get("/:slug", getPost);
 
 // VIEW endpoint (POST)
-router.post("/:slug/view", viewPost);
+router.post("/:slug/view", viewPost); // viewPost imported from controller
 
 // LIKE (protected)
 router.post("/:slug/like", protect, likePost);
