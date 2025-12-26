@@ -10,7 +10,7 @@ import AddPost from "./pages/AddPost";
 import EditPost from "./pages/EditPost";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
-import MyPosts from "./pages/Myposts";
+import MyPosts from "./pages/MyPosts";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 
