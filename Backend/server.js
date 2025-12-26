@@ -11,7 +11,17 @@ import postRoutes from "./routes/postRoutes.js";   // ⭐ MUST BE HERE
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",               // local frontend
+      "http://localhost:5174",               // local admin
+      "https://megaproject-8tdb.vercel.app",  // deployed frontend
+      "https://YOUR-ADMIN.vercel.app"        // deployed admin (if any)
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // ⭐ ROUTES MUST BE BELOW middleware
