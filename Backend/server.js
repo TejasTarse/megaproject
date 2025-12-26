@@ -5,6 +5,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import commentRoutes from "./routes/commentRoutes.js";
 import postRoutes from "./routes/postRoutes.js";   // ⭐ MUST BE HERE
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.json());
 // ⭐ ROUTES MUST BE BELOW middleware
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/comments", commentRoutes);
 app.use("/api/posts", postRoutes);  // ⭐ MUST BE HERE
 
 mongoose

@@ -21,23 +21,32 @@ const Login = () => {
 
     return (
         <div className="h-screen flex items-center justify-center bg-gray-100">
-            <form className="bg-white p-8 shadow-md rounded" onSubmit={handleSubmit}>
-                <h2 className="text-2xl font-bold mb-4">Admin Login</h2>
+            <form
+                className="bg-white p-8 shadow-md rounded w-96"
+                onSubmit={handleSubmit}
+            >
+                <h2 className="text-2xl font-bold mb-4 text-center">
+                    Admin Login
+                </h2>
 
-                {error && <p className="text-red-500">{error}</p>}
+                {error && <p className="text-red-500 mb-2">{error}</p>}
 
                 <input
                     type="email"
                     placeholder="Email"
                     className="border p-2 mb-2 w-full"
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    onChange={(e) =>
+                        setForm({ ...form, email: e.target.value })
+                    }
                 />
 
                 <input
                     type="password"
                     placeholder="Password"
                     className="border p-2 mb-4 w-full"
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    onChange={(e) =>
+                        setForm({ ...form, password: e.target.value })
+                    }
                 />
 
                 <button
@@ -47,6 +56,13 @@ const Login = () => {
                 >
                     {loading ? "Checking..." : "Login"}
                 </button>
+
+                {/* ✅ Bottom Center Paragraph */}
+                <p className="text-center text-sm text-gray-500 mt-4">
+                    Demo Admin Login <br />
+                    <span className="font-medium">Email:</span> admin@123.com <br />
+                    <span className="font-medium">Password:</span> Admin@123
+                </p>
             </form>
         </div>
     );

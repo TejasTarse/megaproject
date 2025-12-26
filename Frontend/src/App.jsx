@@ -11,6 +11,8 @@ import EditPost from "./pages/EditPost";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import MyPosts from "./pages/Myposts";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
 
 function App(){
   return (
@@ -19,6 +21,8 @@ function App(){
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/posts" element={<AllPosts />} />

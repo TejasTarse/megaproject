@@ -44,6 +44,7 @@ const Posts = () => {
                         <th className="border p-2">Category</th>
                         <th className="border p-2">Views</th>
                         <th className="border p-2">Likes</th>
+                        <th className="border p-2">Comments</th>
                         <th className="border p-2">Status</th>
                         <th className="border p-2">Delete</th>
                     </tr>
@@ -52,7 +53,6 @@ const Posts = () => {
                 <tbody>
                     {posts.map((post) => (
                         <tr key={post._id}>
-                            
                             {/* IMAGE */}
                             <td className="border p-2">
                                 {post.featuredImage ? (
@@ -71,7 +71,13 @@ const Posts = () => {
                             <td className="border p-2">{post.userId}</td>
                             <td className="border p-2">{post.category}</td>
                             <td className="border p-2">{post.views}</td>
-                            <td className="border p-2">{post.likes?.length}</td>
+                            <td className="border p-2">{post.likes?.length || 0}</td>
+
+                            {/* ✅ CORRECT COMMENT COUNT */}
+                            <td className="border p-2">
+                                {post.commentCount || 0}
+                            </td>
+
                             <td className="border p-2 capitalize">{post.status}</td>
 
                             <td className="border p-2">
@@ -82,7 +88,6 @@ const Posts = () => {
                                     Delete
                                 </button>
                             </td>
-
                         </tr>
                     ))}
                 </tbody>
