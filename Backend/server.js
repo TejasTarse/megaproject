@@ -16,7 +16,7 @@ app.use(
     origin: [
       "http://localhost:5173",               // local frontend
       "http://localhost:5174",               // local admin
-      "https://megaproject-8tdb.vercel.app",  // deployed frontend
+      "https://megaproject-n3jk.vercel.app",  // deployed frontend
       "https://YOUR-ADMIN.vercel.app"        // deployed admin (if any)
     ],
     credentials: true,
