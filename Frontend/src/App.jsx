@@ -14,23 +14,25 @@ import MyPosts from "./pages/MyPosts";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 
-function App(){
+function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
         <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/contact" element={<ContactUs />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/posts" element={<AllPosts />} />
-          <Route path="/post/:slug" element={<PostDetail />} />
-          <Route path="/add" element={<AddPost />} />
-          <Route path="/my-posts" element={<MyPosts />} />
-          <Route path="/edit/:slug" element={<EditPost />} />
-        </Routes>
+        <main className="pt-16">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/posts" element={<AllPosts />} />
+            <Route path="/post/:slug" element={<PostDetail />} />
+            <Route path="/add" element={<AddPost />} />
+            <Route path="/my-posts" element={<MyPosts />} />
+            <Route path="/edit/:slug" element={<EditPost />} />
+          </Routes>
+        </main>
         <Footer />
       </BrowserRouter>
     </Provider>

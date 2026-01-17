@@ -32,7 +32,7 @@ export default function Home() {
       <div className="h-screen flex flex-col items-center justify-center gap-4">
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         <p className="text-gray-600 text-sm">
-          Data is fetching from server, please wait for few seconds
+          Data is fetching from Render server, please wait for few seconds
         </p>
       </div>
     );
